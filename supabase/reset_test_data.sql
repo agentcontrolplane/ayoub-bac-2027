@@ -1,5 +1,5 @@
 -- Réinitialisation des données de test.
--- Garde les comptes Supabase Auth et les profils Wejden/Ayoub.
+-- Garde les comptes Supabase Auth et les profils Oussama/Ayoub.
 -- À exécuter dans Supabase > SQL Editor.
 
 begin;
