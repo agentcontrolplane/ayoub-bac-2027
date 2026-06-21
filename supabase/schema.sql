@@ -6,6 +6,25 @@ create table if not exists public.themes (id uuid primary key default gen_random
 create table if not exists public.tasks (id uuid primary key default gen_random_uuid(),family_id text not null default 'ayoub-2027',theme_id uuid references public.themes(id) on delete cascade,title text not null,instructions text,status text not null default 'assigned' check(status in('assigned','done_by_ayoub','validated_by_admin','rejected_by_admin')),student_comment text,admin_comment text,score numeric,max_score numeric default 20,created_at timestamptz default now());
 create table if not exists public.resources (id uuid primary key default gen_random_uuid(),family_id text not null default 'ayoub-2027',theme_id uuid references public.themes(id) on delete set null,subject text check(subject in('maths','physique','chimie','svt','informatique')),type text not null default 'support',title text not null,description text,file_path text not null,file_name text not null,file_size bigint,mime_type text,created_by uuid references public.profiles(id),created_at timestamptz default now());
 create table if not exists public.grades (id uuid primary key default gen_random_uuid(),family_id text not null default 'ayoub-2027',week_id uuid references public.weeks(id) on delete set null,theme_id uuid references public.themes(id) on delete set null,subject text not null check(subject in('maths','physique','chimie','svt','informatique')),title text not null,grade numeric not null,max_grade numeric not null default 20,coefficient numeric default 1,admin_comment text,created_by uuid references public.profiles(id),created_at timestamptz default now());
+
+create table if not exists public.learning_notes (
+  id uuid primary key default gen_random_uuid(),
+  family_id text not null default 'ayoub-2027',
+  created_by uuid references public.profiles(id) on delete set null,
+  week_id uuid references public.weeks(id) on delete set null,
+  theme_id uuid references public.themes(id) on delete set null,
+  task_id uuid references public.tasks(id) on delete set null,
+  subject text not null check(subject in('maths','physique','chimie','svt','informatique')),
+  note_type text not null default 'erreur' check(note_type in('erreur','blocage','question','methode','idee','revision','autre')),
+  title text not null,
+  content text not null,
+  action_plan text,
+  admin_feedback text,
+  status text not null default 'open' check(status in('open','reviewed','resolved')),
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
 create table if not exists public.checkins (id uuid primary key default gen_random_uuid(),family_id text not null default 'ayoub-2027',created_by uuid references public.profiles(id),mood text,energy int check(energy between 1 and 5),blockage text,worked_minutes int default 0,created_at timestamptz default now());
 
 create or replace function public.current_family_id() returns text language sql security definer stable set search_path=public as $$ select family_id from public.profiles where id=auth.uid() $$;
@@ -13,7 +32,7 @@ create or replace function public.current_role() returns text language sql secur
 create or replace function public.is_member() returns boolean language sql security definer stable set search_path=public as $$ select exists(select 1 from public.profiles where id=auth.uid() and family_id='ayoub-2027') $$;
 create or replace function public.is_admin() returns boolean language sql security definer stable set search_path=public as $$ select exists(select 1 from public.profiles where id=auth.uid() and role='admin' and family_id='ayoub-2027') $$;
 
-alter table public.profiles enable row level security;alter table public.weeks enable row level security;alter table public.themes enable row level security;alter table public.tasks enable row level security;alter table public.resources enable row level security;alter table public.grades enable row level security;alter table public.checkins enable row level security;
+alter table public.profiles enable row level security;alter table public.weeks enable row level security;alter table public.themes enable row level security;alter table public.tasks enable row level security;alter table public.resources enable row level security;alter table public.grades enable row level security;alter table public.learning_notes enable row level security;alter table public.checkins enable row level security;
 
 drop policy if exists profiles_read on public.profiles;create policy profiles_read on public.profiles for select using(public.is_member() and family_id=public.current_family_id());
 drop policy if exists weeks_read on public.weeks;create policy weeks_read on public.weeks for select using(public.is_member() and family_id=public.current_family_id());
@@ -27,6 +46,15 @@ drop policy if exists resources_read on public.resources;create policy resources
 drop policy if exists resources_admin_all on public.resources;create policy resources_admin_all on public.resources for all using(public.is_admin() and family_id=public.current_family_id()) with check(public.is_admin() and family_id=public.current_family_id());
 drop policy if exists grades_read on public.grades;create policy grades_read on public.grades for select using(public.is_member() and family_id=public.current_family_id());
 drop policy if exists grades_admin_all on public.grades;create policy grades_admin_all on public.grades for all using(public.is_admin() and family_id=public.current_family_id()) with check(public.is_admin() and family_id=public.current_family_id());
+
+drop policy if exists learning_notes_read on public.learning_notes;create policy learning_notes_read on public.learning_notes for select using(public.is_member() and family_id=public.current_family_id());
+drop policy if exists learning_notes_student_insert on public.learning_notes;create policy learning_notes_student_insert on public.learning_notes for insert with check(public.current_role()='student' and created_by=auth.uid() and family_id=public.current_family_id());
+drop policy if exists learning_notes_admin_insert on public.learning_notes;create policy learning_notes_admin_insert on public.learning_notes for insert with check(public.is_admin() and family_id=public.current_family_id());
+drop policy if exists learning_notes_student_update on public.learning_notes;create policy learning_notes_student_update on public.learning_notes for update using(public.current_role()='student' and created_by=auth.uid() and family_id=public.current_family_id()) with check(public.current_role()='student' and created_by=auth.uid() and family_id=public.current_family_id());
+drop policy if exists learning_notes_admin_update on public.learning_notes;create policy learning_notes_admin_update on public.learning_notes for update using(public.is_admin() and family_id=public.current_family_id()) with check(public.is_admin() and family_id=public.current_family_id());
+drop policy if exists learning_notes_student_delete on public.learning_notes;create policy learning_notes_student_delete on public.learning_notes for delete using(public.current_role()='student' and created_by=auth.uid() and family_id=public.current_family_id());
+drop policy if exists learning_notes_admin_delete on public.learning_notes;create policy learning_notes_admin_delete on public.learning_notes for delete using(public.is_admin() and family_id=public.current_family_id());
+
 drop policy if exists checkins_read on public.checkins;create policy checkins_read on public.checkins for select using(public.is_member() and family_id=public.current_family_id());
 drop policy if exists checkins_student_insert on public.checkins;create policy checkins_student_insert on public.checkins for insert with check(public.current_role()='student' and created_by=auth.uid() and family_id=public.current_family_id());
 drop policy if exists checkins_admin_delete on public.checkins;create policy checkins_admin_delete on public.checkins for delete using(public.is_admin() and family_id=public.current_family_id());
