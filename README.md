@@ -5,8 +5,8 @@ Version corrigée et prête pour Vercel : React + Vite + Supabase Auth + RLS + S
 ## Fonctionnalités
 
 - Connexion sécurisée par Supabase Auth.
-- Deux rôles seulement : `admin` pour Wejden, `student` pour Ayoub.
-- Espace Wejden : initialiser le programme, ajouter thèmes/tâches/fichiers, attribuer notes, valider/refuser tâches, valider semaines, repasser un thème à la semaine suivante.
+- Deux rôles seulement : `admin` pour Oussama, `student` pour Ayoub.
+- Espace Oussama : initialiser le programme, ajouter thèmes/tâches/fichiers, attribuer notes, valider/refuser tâches, valider semaines, repasser un thème à la semaine suivante.
 - Espace Ayoub : voir missions, consulter fichiers, marquer une tâche terminée, envoyer un check-in, voir ses notes.
 - Sécurité RLS : seuls les profils présents dans la table `profiles` avec `family_id = ayoub-2027` peuvent lire les données.
 
@@ -25,13 +25,13 @@ Puis remplir `.env.local` avec les vraies clés Supabase.
 1. Crée un projet Supabase.
 2. Va dans **SQL Editor**.
 3. Copie-colle tout le fichier `supabase/schema.sql` et exécute-le.
-4. Va dans **Authentication > Users** et crée deux utilisateurs : Wejden et Ayoub.
+4. Va dans **Authentication > Users** et crée deux utilisateurs : Oussama et Ayoub.
 5. Récupère leurs UUID dans Auth Users.
 6. Dans SQL Editor, insère les profils :
 
 ```sql
 insert into public.profiles (id, email, full_name, role, family_id) values
-('UUID_WEJDEN', 'email_wejden', 'Wejden', 'admin', 'ayoub-2027'),
+('UUID_Oussama', 'email_Oussama', 'Oussama', 'admin', 'ayoub-2027'),
 ('UUID_AYOUB', 'email_ayoub', 'Ayoub', 'student', 'ayoub-2027');
 ```
 
