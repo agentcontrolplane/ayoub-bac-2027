@@ -200,3 +200,21 @@ drop policy if exists "family read files" on storage.objects; create policy "fam
 drop policy if exists "family upload files" on storage.objects; create policy "family upload files" on storage.objects for insert with check (bucket_id='ayoub-files' and public.is_family_member());
 drop policy if exists "admin update files" on storage.objects; create policy "admin update files" on storage.objects for update using (bucket_id='ayoub-files' and public.is_admin()) with check (bucket_id='ayoub-files' and public.is_admin());
 drop policy if exists "admin delete files" on storage.objects; create policy "admin delete files" on storage.objects for delete using (bucket_id='ayoub-files' and public.is_admin());
+
+
+-- V7 safety migration block: create table if exists is not enough when the database was created with an older version.
+-- This block adds missing columns and asks PostgREST to reload its schema cache.
+alter table if exists public.tasks add column if not exists lesson_id uuid references public.lessons(id) on delete cascade;
+alter table if exists public.resources add column if not exists lesson_id uuid references public.lessons(id) on delete set null;
+alter table if exists public.resources add column if not exists exercise_id uuid references public.exercises(id) on delete set null;
+alter table if exists public.submissions add column if not exists lesson_id uuid references public.lessons(id) on delete set null;
+alter table if exists public.grades add column if not exists lesson_id uuid references public.lessons(id) on delete set null;
+alter table if exists public.grades add column if not exists exercise_id uuid references public.exercises(id) on delete set null;
+alter table if exists public.learning_notes add column if not exists lesson_id uuid references public.lessons(id) on delete set null;
+alter table if exists public.learning_notes add column if not exists exercise_id uuid references public.exercises(id) on delete set null;
+alter table if exists public.weeks add column if not exists target_hours numeric default 20;
+alter table if exists public.days add column if not exists target_hours numeric default 4;
+alter table if exists public.lessons add column if not exists target_minutes int default 60;
+alter table if exists public.exercises add column if not exists duration_minutes int default 30;
+alter table if exists public.exercises add column if not exists points numeric default 20;
+notify pgrst, 'reload schema';
