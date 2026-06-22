@@ -1,43 +1,29 @@
-# Mission Bac Ayoub v5 · Programme par heures + tests diagnostic
+# Mission Bac Ayoub 2027 · v6 Tutor Pro
 
-Cette version ajoute un vrai planning professionnel :
+Plateforme privée React + Vite + Supabase + Vercel pour suivre Ayoub comme une vraie plateforme de tutorat.
 
-- programme d’été calculé par **heures prévues par semaine** ;
-- chaque semaine contient **5 jours structurés** ;
-- chaque jour contient des thèmes par matière avec durée prévue ;
-- la **semaine 1** contient des tests diagnostic complets avec exercices et réponses attendues ;
-- Ayoub peut ajouter ses erreurs, blocages, questions, méthodes et scores personnels dans le carnet d’erreurs ;
-- Oussama/Asma peut valider/refuser les tâches, valider une semaine, attribuer des notes, répondre aux notes du carnet et repasser un thème à la semaine suivante.
+## Fonctions principales
 
-## Mise à jour depuis la v4
+### Accès Wejden / admin
+- Créer de nouvelles semaines.
+- Définir les heures prévues par semaine et par jour.
+- Ajouter des jours, des leçons et des tâches.
+- Créer des exercices avec énoncé, réponse attendue, correction, points et durée.
+- Ajouter des cours, exercices, supports et corrections en fichiers privés.
+- Voir les soumissions d’Ayoub avec photo/PDF/fichier.
+- Corriger une soumission, ajouter une note, un feedback et demander une reprise.
+- Valider une semaine.
+- Repasser une leçon ou un thème à la semaine suivante.
+- Lire et commenter le carnet d’erreurs d’Ayoub.
 
-1. Remplace le code de ton projet par ce dossier.
-2. Garde ton fichier `.env.local` :
-
-```bash
-VITE_SUPABASE_URL=https://ton-projet.supabase.co
-VITE_SUPABASE_ANON_KEY=ta_cle_publishable_ou_anon
-```
-
-3. Dans Supabase > SQL Editor, lance :
-
-```bash
-supabase/migration_v4_to_v5.sql
-```
-
-4. Pour supprimer les données de test et repartir proprement, lance :
-
-```bash
-supabase/reset_test_data.sql
-```
-
-Ce reset garde les deux comptes et les deux profils. Il supprime seulement les semaines, thèmes, tâches, notes, fichiers, carnet d’erreurs et check-ins.
-
-5. Lance le site, connecte-toi avec Oussama/Asma/admin, puis clique sur :
-
-```text
-Initialiser le programme v5
-```
+### Accès Ayoub / élève
+- Voir le programme par semaine, jour et durée prévue.
+- Voir les exercices.
+- Soumettre une réponse écrite.
+- Ajouter une photo ou un fichier contenant la réalisation d’un exercice.
+- Voir les fichiers/supports ajoutés par Wejden.
+- Ajouter des erreurs, blocages, questions et méthodes dans son carnet.
+- Consulter les notes et les retours de Wejden.
 
 ## Installation locale
 
@@ -46,23 +32,58 @@ npm install
 npm run dev
 ```
 
-## Déploiement Vercel
-
-Pousse les fichiers sur GitHub, puis laisse Vercel redéployer.
-
-Dans Vercel > Settings > Environment Variables, garde :
+Créer un fichier `.env.local` à la racine :
 
 ```bash
 VITE_SUPABASE_URL=https://ton-projet.supabase.co
 VITE_SUPABASE_ANON_KEY=ta_cle_publishable_ou_anon
 ```
 
-Après modification des variables, clique sur Redeploy.
+## Configuration Supabase
 
-## Fichiers importants
+1. Créer un projet Supabase.
+2. Aller dans SQL Editor.
+3. Exécuter `supabase/schema.sql`.
+4. Aller dans Authentication > Users.
+5. Créer seulement deux utilisateurs : Wejden et Ayoub.
+6. Copier les UUID des deux utilisateurs.
+7. Exécuter dans SQL Editor :
 
-- `src/program.js` : programme d’été avec les semaines, jours, heures et exercices diagnostic.
-- `src/App.jsx` : application React.
-- `supabase/migration_v4_to_v5.sql` : migration si tu avais déjà la v4.
-- `supabase/reset_test_data.sql` : reset propre des données de test.
-- `supabase/schema.sql` : installation complète si tu repars de zéro.
+```sql
+insert into public.profiles (id, email, full_name, role, family_id)
+values
+('UUID_WEJDEN', 'email_wejden', 'Wejden', 'admin', 'ayoub-2027'),
+('UUID_AYOUB', 'email_ayoub', 'Ayoub', 'student', 'ayoub-2027');
+```
+
+8. Désactiver les inscriptions publiques dans Authentication > Providers > Email si possible.
+
+## Reset des données de test
+
+Pour supprimer les semaines, exercices, fichiers, notes, soumissions et carnet d’erreurs tout en gardant les deux comptes :
+
+```sql
+-- Exécuter le fichier : supabase/reset_test_data.sql
+```
+
+## Déploiement Vercel
+
+Dans Vercel, ajouter les variables :
+
+```bash
+VITE_SUPABASE_URL=https://ton-projet.supabase.co
+VITE_SUPABASE_ANON_KEY=ta_cle_publishable_ou_anon
+```
+
+Puis déployer avec :
+
+```bash
+npm run build
+```
+
+Output directory : `dist`.
+
+## Important
+
+La clé `service_role` ne doit jamais être utilisée dans React ou Vercel côté front.
+Le site utilise des règles RLS pour limiter l’accès aux deux profils ajoutés dans `profiles`.
