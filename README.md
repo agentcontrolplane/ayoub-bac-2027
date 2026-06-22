@@ -7,7 +7,7 @@ Cette version ajoute un vrai planning professionnel :
 - chaque jour contient des thèmes par matière avec durée prévue ;
 - la **semaine 1** contient des tests diagnostic complets avec exercices et réponses attendues ;
 - Ayoub peut ajouter ses erreurs, blocages, questions, méthodes et scores personnels dans le carnet d’erreurs ;
-- Wejden peut valider/refuser les tâches, valider une semaine, attribuer des notes, répondre aux notes du carnet et repasser un thème à la semaine suivante.
+- Oussama/Asma peut valider/refuser les tâches, valider une semaine, attribuer des notes, répondre aux notes du carnet et repasser un thème à la semaine suivante.
 
 ## Mise à jour depuis la v4
 
@@ -33,7 +33,7 @@ supabase/reset_test_data.sql
 
 Ce reset garde les deux comptes et les deux profils. Il supprime seulement les semaines, thèmes, tâches, notes, fichiers, carnet d’erreurs et check-ins.
 
-5. Lance le site, connecte-toi avec Wejden/admin, puis clique sur :
+5. Lance le site, connecte-toi avec Oussama/Asma/admin, puis clique sur :
 
 ```text
 Initialiser le programme v5

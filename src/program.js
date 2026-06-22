@@ -23,7 +23,7 @@ export const SUMMER_PROGRAM = [
           {
             subject: 'maths', activity_kind: 'diagnostic', title: 'Diagnostic maths : calcul, fractions, équations, fonctions', planned_hours: 2.5,
             objective: 'Évaluer les bases indispensables avant d’attaquer les chapitres du bac.',
-            tasks: ['Faire le test sans aide pendant 60 minutes.', 'Corriger avec Wejden en notant chaque erreur dans le carnet.', 'Classer les erreurs : calcul, signe, méthode, compréhension.'],
+            tasks: ['Faire le test sans aide pendant 60 minutes.', 'Corriger avec Oussama/Asma en notant chaque erreur dans le carnet.', 'Classer les erreurs : calcul, signe, méthode, compréhension.'],
             diagnostic_questions: [
               q('Calcule : 7 - 3 × 2 + 8 ÷ 4.', '3', 1, 'Priorités opératoires.'),
               q('Calcule : -4 + 9 - 12.', '-7', 1, 'Attention aux signes.'),
