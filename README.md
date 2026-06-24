@@ -1,44 +1,55 @@
-# Mission Bac Ayoub v7 Diagnostic Pro
+# Mission Bac Ayoub v8
 
-Cette version corrige l'erreur Supabase :
+Version v8 : amélioration de la banque d’exercices et de la vue programme.
 
-`Could not find the 'lesson_id' column of 'tasks' in the schema cache`
+## Nouveautés
 
-Elle ajoute aussi une semaine 1 beaucoup plus profonde avec de vrais exercices diagnostiques en :
-- maths ;
-- physique ;
-- chimie ;
-- SVT ;
-- informatique.
+- L’admin peut modifier un exercice existant.
+- L’admin peut supprimer un exercice.
+- Les exercices sont filtrables par matière : maths, physique, chimie, SVT, informatique.
+- Les brouillons de réponse d’Ayoub sont conservés avec `sessionStorage` tant que l’onglet reste ouvert.
+- Le formulaire admin de création/modification d’exercice garde aussi un brouillon pendant la session.
+- La vue Programme affiche directement les exercices liés à chaque leçon, avec titre, matière, durée, points et extrait de l’énoncé.
+- Le bouton `Repasser semaine suivante` copie aussi les exercices de la leçon vers la semaine suivante.
 
-## Mise à jour si tu avais déjà une base Supabase
+## Mise à jour sans perdre les exercices existants
 
-1. Va dans Supabase > SQL Editor.
-2. Exécute : `supabase/migration_v7_schema_fix.sql`.
-3. Si tu veux repartir proprement, exécute ensuite : `supabase/reset_test_data.sql`.
-4. Relance le site.
-5. Connecte-toi en admin et clique sur : `Initialiser le programme v7 diagnostic`.
+Tu n’as pas besoin de reset Supabase.
 
-## Pourquoi cette erreur arrivait ?
-
-Tu avais une table `tasks` créée avec une ancienne version du projet. Le code v6 utilisait `lesson_id`, mais la table existante ne contenait pas encore cette colonne. En PostgreSQL, `create table if not exists` ne modifie pas une table déjà existante. Il faut donc une migration `alter table add column if not exists`.
-
-## Installation locale
+1. Remplace seulement le code par cette v8.
+2. Garde ton fichier `.env.local`.
+3. Lance :
 
 ```bash
 npm install
 npm run dev
 ```
 
-## Variables d'environnement
-
-Crée `.env.local` :
+4. Si tu déploies sur Vercel :
 
 ```bash
-VITE_SUPABASE_URL=https://ton-projet.supabase.co
-VITE_SUPABASE_ANON_KEY=ta_cle_publishable_ou_anon
+git add .
+git commit -m "v8 exercices edit cache programme"
+git push
 ```
 
-## Déploiement Vercel
+Puis fais un redeploy sur Vercel si nécessaire.
 
-Pousse cette version sur GitHub puis redéploie sur Vercel. Vérifie que les variables `VITE_SUPABASE_URL` et `VITE_SUPABASE_ANON_KEY` existent dans Vercel.
+## Important
+
+Cette version ne supprime aucune donnée existante. Les exercices déjà créés restent dans Supabase.
+
+Le cache est volontairement en `sessionStorage` : il garde les textes si Ayoub change de page dans le site ou recharge la page, mais il est supprimé quand l’onglet est fermé.
+
+
+## SQL optionnel
+
+Cette v8 ne nécessite pas de reset.
+
+Tu peux exécuter :
+
+```sql
+supabase/migration_v8_keep_existing_data.sql
+```
+
+Cela ne supprime aucune donnée. Cela force seulement Supabase à recharger le cache de schéma si besoin.
